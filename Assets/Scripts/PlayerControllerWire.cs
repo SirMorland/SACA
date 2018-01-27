@@ -89,7 +89,7 @@ public class PlayerControllerWire : MonoBehaviour
 			{
 				selectedControllerTransform = null;
 				Physics.gravity = defaultGravity;
-				rigidbody.AddForce((oldPosition - controller1Object.transform.position) * 5000);
+				rigidbody.AddForce((oldPosition - controller1Object.transform.position) * 10000);
 			}
 		}
 		if (Controller2.GetHairTriggerUp())
@@ -100,7 +100,7 @@ public class PlayerControllerWire : MonoBehaviour
 			{
 				selectedControllerTransform = null;
 				Physics.gravity = defaultGravity;
-				rigidbody.AddForce((oldPosition - controller2Object.transform.position) * 5000);
+				rigidbody.AddForce((oldPosition - controller2Object.transform.position) * 10000);
 			}
 		}
 
