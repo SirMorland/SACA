@@ -1,32 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerControllerWire : MonoBehaviour
 {
 	public GameObject controller1Object;
-	SphereCollider controller1Collider;
+	Material controller1Material;
 	public GameObject controller2Object;
-	SphereCollider controller2Collider;
+	Material controller2Material;
 	GameObject headObject;
+	SpriteRenderer fader;
 
 	private SteamVR_TrackedObject controller1;
 	private SteamVR_TrackedObject controller2;
 
 	public SteamVR_Controller.Device Controller1
 	{
-		get {
-			if (controller1) return SteamVR_Controller.Input((int)controller1.index);
-			else return null;
-		}
+		get { return SteamVR_Controller.Input((int)controller1.index); }
 	}
 	public SteamVR_Controller.Device Controller2
 	{
-		get
-		{
-			if (controller1) return SteamVR_Controller.Input((int)controller2.index);
-			else return null;
-		}
+		get { return SteamVR_Controller.Input((int)controller2.index); }
 	}
 
 	public Transform selectedControllerTransform;
@@ -57,10 +52,13 @@ public class PlayerControllerWire : MonoBehaviour
 			Hand2CollisionExit;
 
 		headObject = GameObject.FindGameObjectWithTag("MainCamera");
+		fader = headObject.transform.GetChild(0).GetComponent<SpriteRenderer>();
 		head = GetComponent<SphereCollider>();
 		rigidbody = GetComponent<Rigidbody>();
-		controller1Collider = controller1Object.GetComponent<SphereCollider>();
-		controller2Collider = controller2Object.GetComponent<SphereCollider>();
+		controller1Material = controller1Object.transform.GetChild(0).GetComponent<MeshRenderer>().material;
+		controller2Material = controller2Object.transform.GetChild(0).GetComponent<MeshRenderer>().material;
+
+		StartCoroutine(Begin());
 	}
 
 	void Update ()
@@ -72,19 +70,18 @@ public class PlayerControllerWire : MonoBehaviour
 			selectedControllerTransform = controller1Object.transform;
 			oldPosition = selectedControllerTransform.position;
 			Physics.gravity = Vector3.zero;
-			controller1Collider.enabled = false;
+			//controller1MeshRenderer.material.color = new Color(0.2f, 0.2f, 0.2f);
 		}
 		if (Controller2.GetHairTriggerDown() && hand2Colliding)
 		{
 			selectedControllerTransform = controller2Object.transform;
 			oldPosition = selectedControllerTransform.position;
 			Physics.gravity = Vector3.zero;
-			controller2Collider.enabled = false;
+			//controller2MeshRenderer.material.color = new Color(0.2f, 0.2f, 0.2f);
 		}
 		if (Controller1.GetHairTriggerUp())
 		{
-			controller1Collider.enabled = true;
-			hand1Colliding = false;
+			//controller1MeshRenderer.material.color = new Color(1f, 1f, 1f);
 			if (selectedControllerTransform == controller1Object.transform)
 			{
 				selectedControllerTransform = null;
@@ -94,8 +91,7 @@ public class PlayerControllerWire : MonoBehaviour
 		}
 		if (Controller2.GetHairTriggerUp())
 		{
-			controller2Collider.enabled = true;
-			hand2Colliding = false;
+			//controller2MeshRenderer.material.color = new Color(1f, 1f, 1f);
 			if (selectedControllerTransform == controller2Object.transform)
 			{
 				selectedControllerTransform = null;
@@ -106,6 +102,8 @@ public class PlayerControllerWire : MonoBehaviour
 
 		if (selectedControllerTransform)
 		{
+			rigidbody.velocity = Vector3.zero;
+
 			transform.position = Vector3.Lerp(
 				transform.position,
 				transform.position + (oldPosition - selectedControllerTransform.position),
@@ -113,40 +111,56 @@ public class PlayerControllerWire : MonoBehaviour
 			);
 			oldPosition = selectedControllerTransform.position;
 		}
+
+		if(transform.position.y < -10)
+		{
+			StartCoroutine(EndGame());
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.collider.tag == "Tube")
+		{
+			selectedControllerTransform = null;
+			Physics.gravity = defaultGravity;
+		}
 	}
 
 	void Hand1CollisionEnter(Collision collision)
 	{
-		if(collision.collider.tag == "Tube")
+		hand1Colliding = true;
+		controller1Material.SetColor("_EmissionColor", new Color(1f, 1f, 0.8f));
+		StartCoroutine(Vibrate(1));
+
+		if(collision.collider.tag == "Goal")
 		{
-			hand1Colliding = true;
-			StartCoroutine(Vibrate(1));
+			StartCoroutine(End());
 		}
 	}
 
 	void Hand2CollisionEnter(Collision collision)
 	{
-		if (collision.collider.tag == "Tube")
+		hand2Colliding = true;
+		controller2Material.SetColor("_EmissionColor", new Color(1f, 1f, 0.8f));
+		StartCoroutine(Vibrate(2));
+
+		if (collision.collider.tag == "Goal")
 		{
-			hand2Colliding = true;
-			StartCoroutine(Vibrate(2));
+			StartCoroutine(End());
 		}
 	}
 
 	void Hand1CollisionExit(Collision collision)
 	{
-		if (collision.collider.tag == "Tube")
-		{
-			hand1Colliding = false;
-		}
+		hand1Colliding = false;
+		controller1Material.SetColor("_EmissionColor", new Color(1f, 1f, 1f));
 	}
 
 	void Hand2CollisionExit(Collision collision)
 	{
-		if (collision.collider.tag == "Tube")
-		{
-			hand2Colliding = false;
-		}
+		hand2Colliding = false;
+		controller2Material.SetColor("_EmissionColor", new Color(1f, 1f, 1f));
 	}
 
 	IEnumerator Vibrate(int i)
@@ -161,14 +175,35 @@ public class PlayerControllerWire : MonoBehaviour
 		}
 	}
 
-	private void OnCollisionEnter(Collision collision)
+	IEnumerator Begin()
 	{
-		if(collision.collider.tag == "Tube")
+		while (fader.color.a > 0.01f)
 		{
-			selectedControllerTransform = null;
-			Physics.gravity = defaultGravity;
-			controller1Collider.enabled = true;
-			controller2Collider.enabled = true;
+			fader.color = Color.Lerp(fader.color, new Color(0.4f, 1f, 1f, 0f), Time.deltaTime);
+			yield return null;
+		}
+	}
+
+	IEnumerator End()
+	{
+		AsyncOperation loadScene = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex + 1);
+
+		while(fader.color.a < 0.9f && !loadScene.isDone)
+		{
+			fader.color = Color.Lerp(fader.color, new Color(0.4f, 1f, 1f, 1f), Time.deltaTime);
+			yield return null;
+		}
+
+		//SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+	}
+
+	IEnumerator EndGame()
+	{
+		AsyncOperation loadScene = SceneManager.LoadSceneAsync(5);
+
+		while (!loadScene.isDone)
+		{
+			yield return null;
 		}
 	}
 }

@@ -9,20 +9,30 @@ ModelImporter:
     100002: //RootNode
     100004: Roof
     100006: Walls
+    100008: Doors
+    100010: Wndows
     400000: Floor
     400002: //RootNode
     400004: Roof
     400006: Walls
+    400008: Doors
+    400010: Wndows
     2100000: Material
     2300000: Floor
     2300002: Roof
     2300004: Walls
+    2300006: Doors
+    2300008: Wndows
     3300000: Floor
     3300002: Roof
     3300004: Walls
+    3300006: Doors
+    3300008: Wndows
     4300000: Roof
     4300002: Walls
     4300004: Floor
+    4300006: Wndows
+    4300008: Doors
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

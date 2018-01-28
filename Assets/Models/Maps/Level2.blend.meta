@@ -10,25 +10,55 @@ ModelImporter:
     100004: EndHouse
     100006: //RootNode
     100008: StartHouse
+    100010: Asphalt
+    100012: DecoHouseWindows
+    100014: EndHouseWindows
+    100016: Grass
+    100018: StarHouseWindows
+    100020: WalkWay
     400000: Alley
     400002: DecoHouse
     400004: EndHouse
     400006: //RootNode
     400008: StartHouse
+    400010: Asphalt
+    400012: DecoHouseWindows
+    400014: EndHouseWindows
+    400016: Grass
+    400018: StarHouseWindows
+    400020: WalkWay
     2100000: unnamed
     2100002: Material
     2300000: Alley
     2300002: DecoHouse
     2300004: EndHouse
     2300006: StartHouse
+    2300008: Asphalt
+    2300010: DecoHouseWindows
+    2300012: EndHouseWindows
+    2300014: Grass
+    2300016: StarHouseWindows
+    2300018: WalkWay
     3300000: Alley
     3300002: DecoHouse
     3300004: EndHouse
     3300006: StartHouse
+    3300008: Asphalt
+    3300010: DecoHouseWindows
+    3300012: EndHouseWindows
+    3300014: Grass
+    3300016: StarHouseWindows
+    3300018: WalkWay
     4300000: EndHouse
     4300002: DecoHouse
     4300004: StartHouse
     4300006: Alley
+    4300008: Grass
+    4300010: Asphalt
+    4300012: EndHouseWindows
+    4300014: DecoHouseWindows
+    4300016: StarHouseWindows
+    4300018: WalkWay
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}
